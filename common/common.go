@@ -1,4 +1,4 @@
-package suger
+package common
 
 import (
 	"fmt"
