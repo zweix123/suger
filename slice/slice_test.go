@@ -15,6 +15,7 @@ func TestContain(t *testing.T) {
 		args args
 		want bool
 	}{
+		{"nil", args{nil, 1}, false},
 		{"empty", args{[]int{}, 1}, false},
 		{"not found", args{[]int{1, 2, 3}, 4}, false},
 		{"found", args{[]int{1, 2, 3}, 2}, true},
@@ -38,6 +39,9 @@ func TestEqual(t *testing.T) {
 		args args
 		want bool
 	}{
+		{"nil", args{nil, nil}, true},
+		{"nil and empty", args{nil, []int{}}, true},
+		{"nil and not empty", args{nil, []int{1}}, false},
 		{"empty", args{[]int{}, []int{}}, true},
 		{"not equal", args{[]int{1, 2, 3}, []int{1, 2, 4}}, false},
 		{"equal", args{[]int{1, 2, 3}, []int{1, 2, 3}}, true},
@@ -60,6 +64,7 @@ func TestReverse(t *testing.T) {
 		args args
 		want []int
 	}{
+		{"nil", args{nil}, []int{}},
 		{"empty", args{[]int{}}, []int{}},
 		{"one", args{[]int{1}}, []int{1}},
 		{"two", args{[]int{1, 2}}, []int{2, 1}},
