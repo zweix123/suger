@@ -26,3 +26,19 @@ func Save[T any](filepath string, structSlice []T) error {
 	}
 	return nil
 }
+
+func Load[T any](filepath string) ([]T, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return nil, fmt.Errorf("Error opening file: %w", err)
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	var structSlice []T
+	err = decoder.Decode(&structSlice)
+	if err != nil {
+		return nil, fmt.Errorf("Error decoding structs from JSON: %w", err)
+	}
+	return structSlice, nil
+}
