@@ -16,3 +16,11 @@ func Assert(condition bool, message string) {
 		}
 	}
 }
+
+// HandlePanic 处理panic, 主要用于goroutine的开始, 保证该goroutine的panic不会影响到其他goroutine
+// 必须通过 defer 调用
+func HandlePanic(action func()) {
+	if r := recover(); r != nil {
+		action()
+	}
+}
