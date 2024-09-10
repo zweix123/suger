@@ -31,5 +31,11 @@ go get github.com/zweix123/suger
 + [common](./common)
 + [slice](./slice)
 + [map](./map)
-+ [json](./json)
 + [functional](./functional)
++ [snippet](./snippet)
+
+  This is a special directory with some typical and repetitive scenarios. The functions encapsulated for it do not conform to the design philosophy of Go, but they are indeed very sweet. Therefore, they are placed here and used with caution. This part of the code is often not robust.
+
+  这是一个特别的目录, 有一些典型的、重复的场景，为其封装的函数并不符合Go的设计哲学, 但是确实很甜, 于是放在这里, 使用请谨慎, 这部分代码往往并不鲁棒.
+
+  + [json](./json)
