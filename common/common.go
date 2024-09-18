@@ -22,5 +22,12 @@ func Assert(condition bool, message string) {
 func HandlePanic(action func()) {
 	if r := recover(); r != nil {
 		action()
+		_, file, line, ok := runtime.Caller(1)
+		if !ok {
+			file = "unknown"
+			line = 0
+		}
+		s := fmt.Sprintf("%s:%d panic: %v", file, line, r)
+		_ = s // TODO: add your log here
 	}
 }
