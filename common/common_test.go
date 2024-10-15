@@ -1,33 +1,37 @@
 package common
 
 import (
+	"bytes"
+	"fmt"
+	"os"
+	"strings"
 	"sync"
 	"testing"
 )
 
 func TestAssertPanic(t *testing.T) {
 	defer func() {
-		if r := recover(); r == nil {
+		if r := recover(); r == nil { // no panic
 			t.Errorf("Expected panic, but did not occur")
 		}
 	}()
-	Assert(false, "false")
+	Assert(false, "") // should panic
 }
 
 func TestAssertNotPanic(t *testing.T) {
 	defer func() {
-		if r := recover(); r != nil {
+		if r := recover(); r != nil { // happen panic
 			t.Errorf("Unexpected panic: %v", r)
 		}
 	}()
-	Assert(true, "true")
+	Assert(true, "") // should not panic
 }
 
 func TestHandlePanic(t *testing.T) {
-	// 测试正常情况
 	t.Run("No Panic", func(t *testing.T) {
 		actionCalled := false
-		HandlePanic(func() {
+
+		HandlePanic(func(_ string, _ int, _ any) {
 			actionCalled = true
 		})
 		if actionCalled {
@@ -35,43 +39,73 @@ func TestHandlePanic(t *testing.T) {
 		}
 	})
 
-	// 测试 panic 情况
-	t.Run("With Panic", func(t *testing.T) {
+	t.Run("No Panic In Goroutine", func(t *testing.T) {
 		actionCalled := false
-		// recovered := false
 
-		func() {
-			defer HandlePanic(func() {
-				actionCalled = true
-			})
-			panic("Test panic")
-		}()
-
-		if !actionCalled {
-			t.Error("Action should be called when panic occurs")
-		}
-		// if !recovered {
-		// 	t.Error("Panic should be recovered")
-		// }
-	})
-
-	// 测试在 goroutine 中的使用
-	t.Run("In Goroutine", func(t *testing.T) {
 		var wg sync.WaitGroup
-		actionCalled := false
-
 		wg.Add(1)
-		go func() {
+		go func() { // nolint
 			defer wg.Done()
-			defer HandlePanic(func() {
+			defer HandlePanic(func(_ string, _ int, _ any) {
 				actionCalled = true
 			})
-			panic("Goroutine panic")
+			panic("panic") // nolint
 		}()
-
 		wg.Wait()
+
 		if !actionCalled {
 			t.Error("Action should be called when panic occurs in goroutine")
 		}
 	})
+
+	t.Run("Happen Panic", func(t *testing.T) {
+		actionCalled := false
+
+		var wg sync.WaitGroup
+		wg.Add(1)
+		func() {
+			defer wg.Done()
+			defer HandlePanic(func(_ string, _ int, _ any) {
+				actionCalled = true
+			})
+			panic("panic") // nolint
+		}()
+		wg.Wait()
+
+		if !actionCalled {
+			t.Error("Action should be called when panic occurs")
+		}
+	})
+}
+
+func TestHandlePanicOutput(t *testing.T) {
+	oldStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() { // nolint
+		defer wg.Done()
+		defer HandlePanic(func(file string, line int, err any) {
+			fmt.Printf("%s:%d: %v", file, line, err)
+		})
+		panic("panic") // nolint
+	}()
+	wg.Wait()
+
+	w.Close() // nolint
+	os.Stdout = oldStdout
+
+	var buf bytes.Buffer
+	_, err := buf.ReadFrom(r)
+	if err != nil {
+		t.Errorf("ReadFrom failed: %v", err)
+	}
+	output := buf.String()
+
+	expected := "/usr/local/go/src/runtime/panic.go:914: panic"
+	if !strings.Contains(output, expected) {
+		t.Errorf("Expected output to contain %q, but got %q", expected, output)
+	}
 }
