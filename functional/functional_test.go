@@ -3,6 +3,8 @@ package functional
 import (
 	"strconv"
 	"testing"
+
+	"github.com/zweix123/suger/slice"
 )
 
 func TestMap(t *testing.T) {
@@ -33,7 +35,7 @@ func TestMapParallel(t *testing.T) {
 	if len(result1) != 4 {
 		t.Errorf("expected length of result1 to be 4, got %d", len(result1))
 	}
-	if result1[0] != "Hello" || result1[1] != "Hello" || result1[2] != "Hello" || result1[3] != "Hello" {
+	if !slice.Equal(result1, []string{"Hello", "Hello", "Hello", "Hello"}) {
 		t.Errorf("expected result1 to be [Hello, Hello, Hello, Hello], got %v", result1)
 	}
 	result2 := MapParallel([]int64{1, 2, 3, 4}, func(x int64, _ int) string {
@@ -42,7 +44,7 @@ func TestMapParallel(t *testing.T) {
 	if len(result2) != 4 {
 		t.Errorf("expected length of result2 to be 4, got %d", len(result2))
 	}
-	if result2[0] != "1" || result2[1] != "2" || result2[2] != "3" || result2[3] != "4" {
+	if !slice.Equal(result2, []string{"1", "2", "3", "4"}) {
 		t.Errorf("expected result2 to be [1, 2, 3, 4], got %v", result2)
 	}
 }
@@ -54,7 +56,7 @@ func TestFilter(t *testing.T) {
 	if len(r1) != 2 {
 		t.Errorf("expected length of r1 to be 2, got %d", len(r1))
 	}
-	if r1[0] != 2 || r1[1] != 4 {
+	if !slice.Equal(r1, []int{2, 4}) {
 		t.Errorf("expected r1 to be [2, 4], got %v", r1)
 	}
 
@@ -64,7 +66,7 @@ func TestFilter(t *testing.T) {
 	if len(r2) != 2 {
 		t.Errorf("expected length of r2 to be 2, got %d", len(r2))
 	}
-	if r2[0] != "foo" || r2[1] != "bar" {
+	if !slice.Equal(r2, []string{"foo", "bar"}) {
 		t.Errorf("expected r2 to be [foo, bar], got %v", r2)
 	}
 
