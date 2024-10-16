@@ -21,6 +21,9 @@ func Map[T any, R any](collection []T, iteratee func(item T, index int) R) []R {
 // copy from https://github.com/samber/lo/blob/master/parallel/slice.go
 // Map manipulates a slice and transforms it to a slice of another type.
 // `iteratee` is call in parallel. Result keep the same order.
+// tips:
+// 1. If the execution time of iterate is very short and slower than synchronization, because creating goroutines takes time.
+// 2. If the length of the collection is very large, there may be problems. This function is not a coroutine pool
 func MapParallel[T any, R any](collection []T, iteratee func(item T, index int) R) []R {
 	result := make([]R, len(collection))
 
