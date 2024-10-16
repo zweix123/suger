@@ -1,7 +1,6 @@
 package slice
 
 func Contain[T comparable](l []T, e T) bool {
-	// 只读, 不需要检测l是否是nil, 可以对nil的slice进行便利
 	for _, v := range l {
 		if v == e {
 			return true
