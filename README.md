@@ -39,3 +39,7 @@ go get github.com/zweix123/suger
   这是一个特别的目录, 有一些典型的、重复的场景，为其封装的函数并不符合Go的设计哲学, 但是确实很甜, 于是放在这里, 使用请谨慎, 这部分代码往往并不鲁棒.
 
   + [json](./json)
+
+  + [future](./snippet/future.go): Implementing Promise and Future as Concurrent Primitives in Golang.
+
+    [future](./snippet/future.go): 在Golang中实现promise和future这两个并发原语.
