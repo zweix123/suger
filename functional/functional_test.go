@@ -7,8 +7,8 @@ import (
 	"github.com/zweix123/suger/slice"
 )
 
-func TestMap(t *testing.T) {
-	result1 := Map([]int{1, 2, 3, 4}, func(x int, _ int) string {
+func TestMapSerial(t *testing.T) {
+	result1 := MapSerial([]int{1, 2, 3, 4}, func(x int, _ int) string {
 		return "Hello"
 	})
 	if len(result1) != 4 {
@@ -17,7 +17,7 @@ func TestMap(t *testing.T) {
 	if result1[0] != "Hello" || result1[1] != "Hello" || result1[2] != "Hello" || result1[3] != "Hello" {
 		t.Errorf("expected result1 to be [Hello, Hello, Hello, Hello], got %v", result1)
 	}
-	result2 := Map([]int64{1, 2, 3, 4}, func(x int64, _ int) string {
+	result2 := MapSerial([]int64{1, 2, 3, 4}, func(x int64, _ int) string {
 		return strconv.FormatInt(x, 10)
 	})
 	if len(result2) != 4 {
@@ -46,6 +46,56 @@ func TestMapParallel(t *testing.T) {
 	}
 	if !slice.Equal(result2, []string{"1", "2", "3", "4"}) {
 		t.Errorf("expected result2 to be [1, 2, 3, 4], got %v", result2)
+	}
+}
+
+func TestReduce(t *testing.T) {
+	// TODO
+}
+
+func TestMapReduceSerial(t *testing.T) {
+	srcArray := []int{1, 2, 3, 4}
+	f := func(n int) []int {
+		res := make([]int, 0, n)
+		for i := 1; i <= n; i++ {
+			res = append(res, i)
+		}
+		return res
+	}
+	result := Reduce(
+		MapSerial(srcArray, func(n int, _ int) []int {
+			return f(n)
+		}),
+		func(agg []int, item []int, _ int) []int {
+			return append(agg, item...)
+		},
+		[]int{},
+	)
+	if !slice.Equal(result, []int{1, 1, 2, 1, 2, 3, 1, 2, 3, 4}) {
+		t.Errorf("expected result to be [1, 1, 2, 1, 2, 3, 1, 2, 3, 4], got %v", result)
+	}
+}
+
+func TestMapReduceParallel(t *testing.T) {
+	srcArray := []int{1, 2, 3, 4}
+	f := func(n int) []int {
+		res := make([]int, 0, n)
+		for i := 1; i <= n; i++ {
+			res = append(res, i)
+		}
+		return res
+	}
+	result := Reduce(
+		MapParallel(srcArray, func(n int, _ int) []int {
+			return f(n)
+		}),
+		func(agg []int, item []int, _ int) []int {
+			return append(agg, item...)
+		},
+		[]int{},
+	)
+	if !slice.Equal(result, []int{1, 1, 2, 1, 2, 3, 1, 2, 3, 4}) {
+		t.Errorf("expected result to be [1, 1, 2, 1, 2, 3, 1, 2, 3, 4], got %v", result)
 	}
 }
 

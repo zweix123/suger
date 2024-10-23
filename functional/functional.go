@@ -8,7 +8,7 @@ import (
 
 // copy from https://github.com/samber/lo/blob/master/slice.go
 // Map manipulates a slice and transforms it to a slice of another type.
-func Map[T any, R any](collection []T, iteratee func(item T, index int) R) []R {
+func MapSerial[T any, R any](collection []T, iteratee func(item T, index int) R) []R {
 	result := make([]R, len(collection))
 
 	for i := range collection {
@@ -43,6 +43,17 @@ func MapParallel[T any, R any](collection []T, iteratee func(item T, index int) 
 	wg.Wait()
 
 	return result
+}
+
+// copy from https://github.com/samber/lo/blob/master/slice.go
+// Reduce reduces collection to a value which is the accumulated result of running each element in collection
+// through accumulator, where each successive invocation is supplied the return value of the previous.
+func Reduce[T any, R any](collection []T, accumulator func(agg R, item T, index int) R, initial R) R {
+	for i := range collection {
+		initial = accumulator(initial, collection[i], i)
+	}
+
+	return initial
 }
 
 // copy from https://github.com/samber/lo/blob/master/slice.go
