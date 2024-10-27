@@ -78,3 +78,29 @@ func TestReverse(t *testing.T) {
 		})
 	}
 }
+
+func TestUniq(t *testing.T) {
+	type args struct {
+		src []int
+	}
+	tests := []struct {
+		name string
+		args args
+		want []int
+	}{
+		{"nil", args{nil}, []int{}},
+		{"empty", args{[]int{}}, []int{}},
+		{"one", args{[]int{1}}, []int{1}},
+		{"two", args{[]int{1, 2}}, []int{1, 2}},
+		{"three", args{[]int{1, 2, 3}}, []int{1, 2, 3}},
+		{"duplicate1", args{[]int{1, 1, 2, 2, 3, 3}}, []int{1, 2, 3}},
+		{"duplicate2", args{[]int{1, 2, 3, 3, 2, 1}}, []int{1, 2, 3}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Uniq(tt.args.src); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Uniq() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
