@@ -29,15 +29,3 @@ func Reverse[T any](src []T) (dst []T) {
 	}
 	return
 }
-
-func Uniq[T comparable](src []T) (dst []T) {
-	exist := make(map[T]bool, len(src))
-	dst = make([]T, 0, len(src))
-	for _, v := range src {
-		if !exist[v] {
-			dst = append(dst, v)
-			exist[v] = true
-		}
-	}
-	return dst
-}
