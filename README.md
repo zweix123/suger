@@ -43,3 +43,4 @@ go get github.com/zweix123/suger
   + [future](./snippet/future.go): Implementing Promise and Future as Concurrent Primitives in Golang.
 
     [future](./snippet/future.go): 在Golang中实现promise和future这两个并发原语.
+
