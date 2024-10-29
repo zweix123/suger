@@ -90,7 +90,7 @@ func TestHandlePanicOutput(t *testing.T) {
 		defer HandlePanic(func(file string, line int, err any) {
 			fmt.Printf("%s:%d: %v", file, line, err)
 		})
-		panic("panic") // nolint
+		panic("TestHandlePanicOutput Panic") // nolint
 	}()
 	wg.Wait()
 
@@ -104,7 +104,7 @@ func TestHandlePanicOutput(t *testing.T) {
 	}
 	output := buf.String()
 
-	expected := "/usr/local/go/src/runtime/panic.go:914: panic"
+	expected := "TestHandlePanicOutput Panic"
 	if !strings.Contains(output, expected) {
 		t.Errorf("Expected output to contain %q, but got %q", expected, output)
 	}

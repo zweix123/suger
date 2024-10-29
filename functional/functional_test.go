@@ -1,10 +1,9 @@
 package functional
 
 import (
+	"reflect"
 	"strconv"
 	"testing"
-
-	"github.com/zweix123/suger/slice"
 )
 
 func TestMapSerial(t *testing.T) {
@@ -35,7 +34,7 @@ func TestMapParallel(t *testing.T) {
 	if len(result1) != 4 {
 		t.Errorf("expected length of result1 to be 4, got %d", len(result1))
 	}
-	if !slice.Equal(result1, []string{"Hello", "Hello", "Hello", "Hello"}) {
+	if !reflect.DeepEqual(result1, []string{"Hello", "Hello", "Hello", "Hello"}) {
 		t.Errorf("expected result1 to be [Hello, Hello, Hello, Hello], got %v", result1)
 	}
 	result2 := MapParallel([]int64{1, 2, 3, 4}, func(x int64, _ int) string {
@@ -44,7 +43,7 @@ func TestMapParallel(t *testing.T) {
 	if len(result2) != 4 {
 		t.Errorf("expected length of result2 to be 4, got %d", len(result2))
 	}
-	if !slice.Equal(result2, []string{"1", "2", "3", "4"}) {
+	if !reflect.DeepEqual(result2, []string{"1", "2", "3", "4"}) {
 		t.Errorf("expected result2 to be [1, 2, 3, 4], got %v", result2)
 	}
 }
@@ -71,7 +70,7 @@ func TestMapReduceSerial(t *testing.T) {
 		},
 		[]int{},
 	)
-	if !slice.Equal(result, []int{1, 1, 2, 1, 2, 3, 1, 2, 3, 4}) {
+	if !reflect.DeepEqual(result, []int{1, 1, 2, 1, 2, 3, 1, 2, 3, 4}) {
 		t.Errorf("expected result to be [1, 1, 2, 1, 2, 3, 1, 2, 3, 4], got %v", result)
 	}
 }
@@ -94,7 +93,7 @@ func TestMapReduceParallel(t *testing.T) {
 		},
 		[]int{},
 	)
-	if !slice.Equal(result, []int{1, 1, 2, 1, 2, 3, 1, 2, 3, 4}) {
+	if !reflect.DeepEqual(result, []int{1, 1, 2, 1, 2, 3, 1, 2, 3, 4}) {
 		t.Errorf("expected result to be [1, 1, 2, 1, 2, 3, 1, 2, 3, 4], got %v", result)
 	}
 }
@@ -106,7 +105,7 @@ func TestFilter(t *testing.T) {
 	if len(r1) != 2 {
 		t.Errorf("expected length of r1 to be 2, got %d", len(r1))
 	}
-	if !slice.Equal(r1, []int{2, 4}) {
+	if !reflect.DeepEqual(r1, []int{2, 4}) {
 		t.Errorf("expected r1 to be [2, 4], got %v", r1)
 	}
 
@@ -116,7 +115,7 @@ func TestFilter(t *testing.T) {
 	if len(r2) != 2 {
 		t.Errorf("expected length of r2 to be 2, got %d", len(r2))
 	}
-	if !slice.Equal(r2, []string{"foo", "bar"}) {
+	if !reflect.DeepEqual(r2, []string{"foo", "bar"}) {
 		t.Errorf("expected r2 to be [foo, bar], got %v", r2)
 	}
 
