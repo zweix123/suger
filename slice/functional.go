@@ -9,7 +9,7 @@ var ChunkErr = errors.New("size must be greater than 0")
 // the final chunk will be the remaining elements.
 func Chunk[T any, Slice ~[]T](collection Slice, size int) []Slice {
 	if size <= 0 {
-		return nil //!
+		return nil //! In order not to return an error, it is compatible with unreasonable input parameters here, but the returned value is empty
 	}
 
 	chunksNum := len(collection) / size

@@ -69,3 +69,16 @@ func Filter[T any, Slice ~[]T](collection Slice, predicate func(item T, index in
 
 	return result
 }
+
+// copy from https://github.com/samber/lo/blob/master/slice.go
+// Times invokes the iteratee n times, returning an array of the results of each invocation.
+// The iteratee is invoked with index as argument.
+func Times[T any](count int, iteratee func(index int) T) []T {
+	result := make([]T, count)
+
+	for i := 0; i < count; i++ {
+		result[i] = iteratee(i)
+	}
+
+	return result
+}

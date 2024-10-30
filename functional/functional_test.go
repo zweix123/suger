@@ -128,3 +128,12 @@ func TestFilter(t *testing.T) {
 		t.Errorf("type preserved: expected nonempty to be of type []string, got %T", nonempty)
 	}
 }
+
+func TestTimes(t *testing.T) {
+	result1 := Times(3, func(i int) string {
+		return strconv.FormatInt(int64(i), 10)
+	})
+	if len(result1) != 3 || !reflect.DeepEqual(result1, []string{"0", "1", "2"}) {
+		t.Errorf("expected result1 to be [0, 1, 2], got %v", result1)
+	}
+}
