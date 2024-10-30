@@ -112,3 +112,61 @@ func TestHandlePanicOutput(t *testing.T) {
 		t.Errorf("Expected output to contain %q, but got %q", expected, output)
 	}
 }
+
+func TestLogStr(t *testing.T) {
+	// common test
+	if LogStr(1) != "1" {
+		t.Errorf("LogStr(1) = %q, want %q", LogStr(1), "1")
+	}
+	if LogStr(3.14) != "3.14" {
+		t.Errorf("LogStr(3.14) = %q, want %q", LogStr(3.14), "3.14")
+	}
+	if LogStr("hello") != "\"hello\"" {
+		t.Errorf("LogStr(\"hello\") = %q, want %q", LogStr("hello"), "\"hello\"")
+	}
+	if LogStr([]int{1, 2, 3}) != "[1,2,3]" {
+		t.Errorf("LogStr([1,2,3]) = %q, want %q", LogStr([]int{1, 2, 3}), "[1,2,3]")
+	}
+	if LogStr(map[string]int{"a": 1, "b": 2}) != "{\"a\":1,\"b\":2}" {
+		t.Errorf("LogStr(map[string]int{\"a\":1,\"b\":2}) = %q, want %q", LogStr(map[string]int{"a": 1, "b": 2}), "{\"a\":1,\"b\":2}")
+	}
+
+	// custom type
+	// 1. common
+	type Common struct {
+		A int
+		B float64
+		C string
+		D []int
+		E map[string]int
+	}
+	if LogStr(Common{A: 1, B: 2.0, C: "three", D: []int{4, 5, 6}, E: map[string]int{"seven": 7, "eight": 8}}) != "{\"A\":1,\"B\":2,\"C\":\"three\",\"D\":[4,5,6],\"E\":{\"eight\":8,\"seven\":7}}" {
+		t.Errorf("LogStr(Common{A: 1, B: 2.0, C: \"three\", D: [4,5,6], E: map[seven:7,eight:8]}) = %q, want %q", LogStr(Common{A: 1, B: 2.0, C: "three", D: []int{4, 5, 6}, E: map[string]int{"seven": 7, "eight": 8}}), "{\"A\":1,\"B\":2,\"C\":\"three\",\"D\":[4,5,6],\"E\":{\"eight\":8,\"seven\":7}}")
+	}
+	// 2. private
+	type Private struct {
+		a int
+		b float64
+		c string
+		d []int
+		e map[string]int
+	}
+	if LogStr(Private{a: 1, b: 2.0, c: "three", d: []int{4, 5, 6}, e: map[string]int{"seven": 7, "eight": 8}}) != "{}" { // Non exported fields are not displayed
+		t.Errorf("LogStr(Private{a: 1, b: 2.0, c: \"three\", d: [4,5,6], e: map[seven:7,eight:8]}) = %q, want %q", LogStr(Private{a: 1, b: 2.0, c: "three", d: []int{4, 5, 6}, e: map[string]int{"seven": 7, "eight": 8}}), "{}")
+	}
+
+	// panic type
+	// 1. circular reference
+	type Node struct {
+		Next *Node
+	}
+	n := &Node{}
+	n.Next = n
+	if !strings.Contains(LogStr(n), "is unsupported type") {
+		t.Errorf("LogStr(&Node{Next: n}) = %q, want %q", LogStr(n), "is unsupported type")
+	}
+	// 2. unsupported type
+	if !strings.Contains(LogStr(make(chan int)), "is unsupported type") {
+		t.Errorf("LogStr(make(chan int)) = %q, want %q", LogStr(make(chan int)), "is unsupported type")
+	}
+}

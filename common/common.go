@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	"runtime"
 )
@@ -28,4 +29,12 @@ func HandlePanic(action func(file string, line int, err any)) {
 		}
 		action(file, line, r)
 	}
+}
+
+func LogStr(v interface{}) string {
+	bytes, err := json.Marshal(v)
+	if err != nil {
+		return fmt.Sprintf("%T is unsupported type: %v", v, v)
+	}
+	return string(bytes)
 }
