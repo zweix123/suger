@@ -1,6 +1,6 @@
 package slice
 
-func Contain[T comparable](l []T, e T) bool {
+func Contains[T comparable](l []T, e T) bool {
 	for _, v := range l {
 		if v == e {
 			return true
@@ -28,4 +28,16 @@ func Reverse[T any](src []T) (dst []T) {
 		dst[i], dst[j] = src[j], src[i]
 	}
 	return
+}
+
+func Uniq[T comparable](src []T) (dst []T) {
+	exist := make(map[T]bool, len(src))
+	dst = make([]T, 0, len(src))
+	for _, v := range src {
+		if !exist[v] {
+			dst = append(dst, v)
+			exist[v] = true
+		}
+	}
+	return dst
 }

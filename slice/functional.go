@@ -2,26 +2,14 @@ package slice
 
 import "errors"
 
-func Uniq[T comparable](src []T) (dst []T) {
-	exist := make(map[T]bool, len(src))
-	dst = make([]T, 0, len(src))
-	for _, v := range src {
-		if !exist[v] {
-			dst = append(dst, v)
-			exist[v] = true
-		}
-	}
-	return dst
-}
-
 var ChunkErr = errors.New("size must be greater than 0")
 
 // copy from https://github.com/samber/lo/blob/master/slice.go
 // Chunk returns an array of elements split into groups the length of size. If array can't be split evenly,
 // the final chunk will be the remaining elements.
-func Chunk[T any, Slice ~[]T](collection Slice, size int) ([]Slice, error) {
+func Chunk[T any, Slice ~[]T](collection Slice, size int) []Slice {
 	if size <= 0 {
-		return nil, ChunkErr
+		return nil //!
 	}
 
 	chunksNum := len(collection) / size
@@ -39,7 +27,7 @@ func Chunk[T any, Slice ~[]T](collection Slice, size int) ([]Slice, error) {
 		result = append(result, collection[i*size:last:last])
 	}
 
-	return result, nil
+	return result
 }
 
 // copy from https://github.com/samber/lo/blob/master/slice.go

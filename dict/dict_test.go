@@ -5,23 +5,23 @@ import (
 	"testing"
 )
 
-func TestContain(t *testing.T) {
+func TestContains(t *testing.T) {
 	m1 := map[string]string{}
 	m1["key1"] = "value1"
-	if !Contain(m1, "key1") {
+	if !Contains(m1, "key1") {
 		t.Errorf("Contain should return true")
 	}
-	if Contain(m1, "key2") {
+	if Contains(m1, "key2") {
 		t.Errorf("Contain should return false")
 	}
 
 	var m2 map[string]string = nil
-	if Contain(m2, "key1") {
+	if Contains(m2, "key1") {
 		t.Errorf("Contain should return false")
 	}
 
 	var m3 map[string]string = make(map[string]string)
-	if Contain(m3, "key1") {
+	if Contains(m3, "key1") {
 		t.Errorf("Contain should return false")
 	}
 }

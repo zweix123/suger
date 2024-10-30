@@ -10,37 +10,52 @@ What is my motivation for creating this library?
 
 2. The exceptions in Go are propagated in the form of return values, resulting in most functions having more than one return value, which is inconvenient for nested use of functions. I have no intention of overturning this design, but only want to encapsulate it in appropriate scenarios.
 
+   One solution to this prob lem is in a functional style, while another solution is to use monad's Options, Results, Either, and other types.
+   
    Go的异常通过返回值的形式拓传, 导致大部分函数的返回值个数都大于一个, 不方便函数嵌套使用, 我无意颠覆该设计, 只想在合适的场景作封装.
+
+   这个问题的一个解法是函数式的风格, 另一个解法是monad的Option、Result、Either等类型.
 
 What principles will I follow?
 
 我会遵循什么原则呢?
 
-Go is not C++, Java, Python, it is Go; Simply rewriting code in other languages is not good, and Go's specifications and best practices should be followed.
+1. Go is not C++, Java, Python, it is Go; Simply rewriting code in other languages is not good, and Go's specifications and best practices should be followed.
 
-Go不是C++、Java、Python, 它是Go; 单纯的重写在其他语言的代码并不好, 应该遵循Go的规范和最佳实践.
+   Go不是C++、Java、Python, 它是Go; 单纯的重写在其他语言的代码并不好, 应该遵循Go的规范和最佳实践.
+
+2. As abstract and universal as possible
+  
+   尽可能的抽象和通用
 
 ## Install
 
 ```bash
-go get github.com/zweix123/suger
+go get -u github.com/zweix123/suger
 ```
 
 ## Usage
 
++ [async](./async)
+  + `Future`
 + [common](./common)
-+ [slice](./slice)
-+ [map](./map)
+  + `Assert`
+  + `HandlePanic`
++ [dict](./dict)
+  + `Contains`
+  + `Keys`
+  + `Values`
 + [functional](./functional)
-+ [snippet](./snippet)
+  + `MapSerial`
+  + `MapParallel`
+  + `MapParallelWithLimit`
+  + `Reduce`
+  + `Filter`
++ [slice](./slice)
+  + `Contains`
+  + `Equal`
+  + `Reverse`
+  + `Uniq`
 
-  This is a special directory with some typical and repetitive scenarios. The functions encapsulated for it do not conform to the design philosophy of Go, but they are indeed very sweet. Therefore, they are placed here and used with caution. This part of the code is often not robust.
-
-  这是一个特别的目录, 有一些典型的、重复的场景，为其封装的函数并不符合Go的设计哲学, 但是确实很甜, 于是放在这里, 使用请谨慎, 这部分代码往往并不鲁棒.
-
-  + [json](./json)
-
-  + [future](./snippet/future.go): Implementing Promise and Future as Concurrent Primitives in Golang.
-
-    [future](./snippet/future.go): 在Golang中实现promise和future这两个并发原语.
-
+  + `Chunk`
+  + `Flatten`

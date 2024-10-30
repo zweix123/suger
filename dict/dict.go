@@ -1,10 +1,10 @@
 /*
-dict is map : )
+map is golang key word, so use dict instead.
 */
 
 package dict
 
-func Contain[T comparable, V any](d map[T]V, k T) bool {
+func Contains[T comparable, V any](d map[T]V, k T) bool {
 	_, ok := d[k]
 	return ok
 }
