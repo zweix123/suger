@@ -80,7 +80,10 @@ func TestHandlePanic(t *testing.T) {
 
 func TestHandlePanicOutput(t *testing.T) {
 	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Errorf("os.Pipe failed: %v", err)
+	}
 	os.Stdout = w
 
 	var wg sync.WaitGroup
@@ -98,7 +101,7 @@ func TestHandlePanicOutput(t *testing.T) {
 	os.Stdout = oldStdout
 
 	var buf bytes.Buffer
-	_, err := buf.ReadFrom(r)
+	_, err = buf.ReadFrom(r)
 	if err != nil {
 		t.Errorf("ReadFrom failed: %v", err)
 	}

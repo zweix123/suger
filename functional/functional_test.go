@@ -7,7 +7,7 @@ import (
 )
 
 func TestMapSerial(t *testing.T) {
-	result1 := MapSerial([]int{1, 2, 3, 4}, func(x int, _ int) string {
+	result1 := MapSerial([]int{1, 2, 3, 4}, func(_ int, _ int) string {
 		return "Hello"
 	})
 	if len(result1) != 4 {
@@ -28,7 +28,7 @@ func TestMapSerial(t *testing.T) {
 }
 
 func TestMapParallel(t *testing.T) {
-	result1 := MapParallel([]int{1, 2, 3, 4}, func(x int, _ int) string {
+	result1 := MapParallel([]int{1, 2, 3, 4}, func(_ int, _ int) string {
 		return "Hello"
 	})
 	if len(result1) != 4 {
@@ -48,7 +48,7 @@ func TestMapParallel(t *testing.T) {
 	}
 }
 
-func TestReduce(t *testing.T) {
+func TestReduce(_ *testing.T) {
 	// TODO
 }
 
