@@ -82,3 +82,21 @@ func Times[T any](count int, iteratee func(index int) T) []T {
 
 	return result
 }
+
+func All[T any](collection []T, predicate func(item T, index int) bool) bool {
+	for i := range collection {
+		if !predicate(collection[i], i) {
+			return false
+		}
+	}
+	return true
+}
+
+func Any[T any](collection []T, predicate func(item T, index int) bool) bool {
+	for i := range collection {
+		if predicate(collection[i], i) {
+			return true
+		}
+	}
+	return false
+}

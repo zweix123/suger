@@ -48,8 +48,19 @@ func TestMapParallel(t *testing.T) {
 	}
 }
 
-func TestReduce(_ *testing.T) {
-	// TODO
+func TestReduce(t *testing.T) {
+	result1 := Reduce([]int{1, 2, 3, 4}, func(agg int, item int, _ int) int {
+		return agg + item
+	}, 0)
+	result2 := Reduce([]int{1, 2, 3, 4}, func(agg int, item int, _ int) int {
+		return agg + item
+	}, 10)
+	if result1 != 10 {
+		t.Errorf("expected result1 to be 10, got %d", result1)
+	}
+	if result2 != 20 {
+		t.Errorf("expected result2 to be 20, got %d", result2)
+	}
 }
 
 func TestMapReduceSerial(t *testing.T) {
@@ -135,5 +146,31 @@ func TestTimes(t *testing.T) {
 	})
 	if len(result1) != 3 || !reflect.DeepEqual(result1, []string{"0", "1", "2"}) {
 		t.Errorf("expected result1 to be [0, 1, 2], got %v", result1)
+	}
+}
+
+func TestAll(t *testing.T) {
+	if !All([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
+		return x > 0
+	}) {
+		t.Errorf("expected All to be true")
+	}
+	if All([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
+		return x > 3
+	}) {
+		t.Errorf("expected All to be false")
+	}
+}
+
+func TestAny(t *testing.T) {
+	if !Any([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
+		return x > 3
+	}) {
+		t.Errorf("expected Any to be true")
+	}
+	if Any([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
+		return x > 5
+	}) {
+		t.Errorf("expected Any to be false")
 	}
 }
