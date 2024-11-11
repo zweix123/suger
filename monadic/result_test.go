@@ -2,6 +2,7 @@ package monadic
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -23,6 +24,28 @@ func TestResultDefaultConstructor(t *testing.T) {
 	if e != ErrNotInitialized {
 		t.Errorf("expected error to be ErrNotInitialized, got %v", e)
 	}
+}
+
+func TestResultString(t *testing.T) {
+	t.Run("not initialized", func(t *testing.T) {
+		var r Result[int]
+		if r.String() != "Err[int](not initialized)" {
+			t.Errorf("expected string to be Err[int](not initialized), got %v", r.String())
+		}
+	})
+	t.Run("ok", func(t *testing.T) {
+		r := Ok(1)
+		if r.String() != "Ok[int](1)" {
+			t.Errorf("expected string to be Ok[int](1), got %v", r.String())
+		}
+	})
+	t.Run("err", func(t *testing.T) {
+		e := errors.New("error")
+		r := Err[int](e)
+		if r.String() != fmt.Sprintf("Err[int](%v)", e) {
+			t.Errorf("expected string to be Err[int](%v), got %v", e, r.String())
+		}
+	})
 }
 
 func TestIsOkAndIsErr(t *testing.T) {

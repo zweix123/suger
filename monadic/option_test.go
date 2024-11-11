@@ -26,7 +26,7 @@ func TestOptionDefaultConstructor(t *testing.T) {
 	}
 }
 
-func TestString(t *testing.T) {
+func TestOptionString(t *testing.T) {
 	type C struct {
 		I int
 		B bool

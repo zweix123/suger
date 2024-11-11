@@ -2,9 +2,15 @@ package monadic
 
 // copy from https://github.com/andeya/gust/blob/main/enum_result.go
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
-var ErrNotInitialized = errors.New("not initialized")
+var (
+	ErrNotInitialized   = errors.New("not initialized")
+	ErrImpossibleBranch = errors.New("impossible branch, program bug")
+)
 
 func Ok[T any](t T) Result[T] {
 	return Result[T]{t: Some(t), e: nil}
@@ -17,6 +23,21 @@ func Err[T any](e error) Result[T] {
 type Result[T any] struct {
 	t Option[T]
 	e error
+}
+
+func (r Result[T]) String() string {
+	var zero T
+	if r.IsOk() {
+		return fmt.Sprintf("Ok[%T](%v)", zero, r.t.Unwrap())
+	}
+	if r.t.IsNone() {
+		var zero T
+		if r.e == nil {
+			return fmt.Sprintf("Err[%T](not initialized)", zero)
+		}
+		return fmt.Sprintf("Err[%T](%v)", zero, r.e)
+	}
+	return fmt.Sprintf("Err[%T](%v)", zero, ErrImpossibleBranch)
 }
 
 /*
@@ -45,5 +66,5 @@ func (r Result[T]) Unwrap() (T, error) {
 		}
 		return zero, r.e
 	}
-	panic("Impossible branch, program bug")
+	panic(ErrImpossibleBranch)
 }
