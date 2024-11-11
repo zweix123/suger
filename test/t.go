@@ -14,7 +14,7 @@ func HandleStdout(f func()) (buf bytes.Buffer) {
 
 	r, w, err := os.Pipe()
 	if err != nil {
-		panic(err)
+		panic(err) // nolint
 	}
 	os.Stdout = w
 
@@ -25,7 +25,7 @@ func HandleStdout(f func()) (buf bytes.Buffer) {
 
 	_, err = buf.ReadFrom(r)
 	if err != nil {
-		panic(err)
+		panic(err) // nolint
 	}
 
 	return buf
