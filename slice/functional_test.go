@@ -20,19 +20,18 @@ func TestChunk(t *testing.T) {
 	}
 	type wants struct {
 		result [][]int
-		err    error
 	}
 	tests := []struct {
 		name string
 		args args
 		want wants
 	}{
-		{"nil", args{nil, 2}, wants{[][]int{}, nil}},
-		{"empty", args{[]int{}, 2}, wants{[][]int{}, nil}},
-		{"one", args{[]int{1}, 2}, wants{[][]int{{1}}, nil}},
-		{"two", args{[]int{1, 2}, 2}, wants{[][]int{{1, 2}}, nil}},
-		{"three", args{[]int{1, 2, 3}, 2}, wants{[][]int{{1, 2}, {3}}, nil}},
-		{"zero", args{[]int{1, 2, 3}, 0}, wants{nil, ChunkErr}},
+		{"nil", args{nil, 2}, wants{[][]int{}}},
+		{"empty", args{[]int{}, 2}, wants{[][]int{}}},
+		{"one", args{[]int{1}, 2}, wants{[][]int{{1}}}},
+		{"two", args{[]int{1, 2}, 2}, wants{[][]int{{1, 2}}}},
+		{"three", args{[]int{1, 2, 3}, 2}, wants{[][]int{{1, 2}, {3}}}},
+		{"zero", args{[]int{1, 2, 3}, 0}, wants{nil}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
