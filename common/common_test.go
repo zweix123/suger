@@ -1,26 +1,13 @@
 package common
 
 import (
-	"bytes"
 	"fmt"
-	"os"
-	"runtime"
 	"strings"
 	"sync"
 	"testing"
-)
 
-func TestCurrentGetPanicInfo(t *testing.T) {
-	var file string
-	var line int
-	var ok bool
-	func() {
-		file, line, ok = currentGetPanicInfo(1)
-	}()
-	if !strings.HasSuffix(file, "common_test.go") || ok != true {
-		t.Errorf("Expected file to be common_test.go, ok to be true, got %q, %d, %t", file, line, ok)
-	}
-}
+	"github.com/zweix123/suger/test"
+)
 
 func TestAssertPanic(t *testing.T) {
 	defer func() {
@@ -40,70 +27,9 @@ func TestAssertNotPanic(t *testing.T) {
 	Assert(true, "") // should not panic
 }
 
-func TestAssertMock(t *testing.T) {
-	// 默认的
-	currentGetPanicInfo = func(skip int) (file string, line int, ok bool) {
-		_, file, line, ok = runtime.Caller(skip + 1)
-		return
-	}
-	defer func() {
-		r := recover()
-		if r == nil { // no panic
-			t.Errorf("Expected panic, but did not occur")
-		}
-		s, ok := r.(string)
-		if !ok {
-			t.Errorf("Expected panic message to be string, got %T", r)
-		}
-		if !strings.Contains(s, "common_test.go") || !strings.Contains(s, "assert_message") {
-			t.Errorf("Expected panic message to contain common_test.go and assert_message, got %q", s)
-		}
-	}()
-	Assert(false, "assert_message") // should panic
-
-	// 返回真的
-	currentGetPanicInfo = func(skip int) (file string, line int, ok bool) {
-		return "mock.go", 0, true
-	}
-	defer func() {
-		r := recover()
-		if r == nil { // no panic
-			t.Errorf("Expected panic, but did not occur")
-		}
-		s, ok := r.(string)
-		if !ok {
-			t.Errorf("Expected panic message to be string, got %T", r)
-		}
-		if s != "mock.go:0: assert_message" {
-			t.Errorf("Expected panic message to be mock.go:0: assert_message, got %q", s)
-		}
-	}()
-	Assert(false, "assert_message") // should panic
-
-	// 返回假的
-	currentGetPanicInfo = func(skip int) (file string, line int, ok bool) {
-		return "", 0, false
-	}
-	defer func() {
-		r := recover()
-		if r == nil { // no panic
-			t.Errorf("Expected panic, but did not occur")
-		}
-		s, ok := r.(string)
-		if !ok {
-			t.Errorf("Expected panic message to be string, got %T", r)
-		}
-		if s != "unknown: assert_message" {
-			t.Errorf("Expected panic message to be unknown: assert_message, got %q", s)
-		}
-	}()
-	Assert(false, "assert_message") // should panic
-}
-
 func TestHandlePanic(t *testing.T) {
 	t.Run("No Panic", func(t *testing.T) {
 		actionCalled := false
-
 		HandlePanic(func(_ string, _ int, _ any) {
 			actionCalled = true
 		})
@@ -152,83 +78,24 @@ func TestHandlePanic(t *testing.T) {
 }
 
 func TestHandlePanicOutput(t *testing.T) {
-	oldStdout := os.Stdout
-	r, w, err := os.Pipe()
-	if err != nil {
-		t.Errorf("os.Pipe failed: %v", err)
+	msg := "TestHandlePanicOutput Panic"
+
+	buf := test.HandleStdout(func() {
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() { // nolint
+			defer wg.Done()
+			defer HandlePanic(func(_ string, _ int, err any) {
+				fmt.Printf("%v", err)
+			})
+			panic(msg) // nolint
+		}()
+		wg.Wait()
+	})
+
+	if buf.String() != msg {
+		t.Errorf("Expected output to be %q, but got %q", msg, buf.String())
 	}
-	os.Stdout = w
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() { // nolint
-		defer wg.Done()
-		defer HandlePanic(func(file string, line int, err any) {
-			fmt.Printf("%s:%d: %v", file, line, err)
-		})
-		panic("TestHandlePanicOutput Panic") // nolint
-	}()
-	wg.Wait()
-
-	w.Close() // nolint
-	os.Stdout = oldStdout
-
-	var buf bytes.Buffer
-	_, err = buf.ReadFrom(r)
-	if err != nil {
-		t.Errorf("ReadFrom failed: %v", err)
-	}
-	output := buf.String()
-
-	expected := "TestHandlePanicOutput Panic"
-	if !strings.Contains(output, expected) {
-		t.Errorf("Expected output to contain %q, but got %q", expected, output)
-	}
-}
-
-func TestHandlePanicMock(t *testing.T) {
-	currentGetPanicInfo = func(skip int) (file string, line int, ok bool) {
-		_, file, line, ok = runtime.Caller(skip + 1)
-		return
-	}
-	var wg1 sync.WaitGroup
-	wg1.Add(1)
-	go func() { // nolint
-		defer wg1.Done()
-		defer HandlePanic(func(file string, _ int, err any) {
-			if !strings.HasSuffix(file, "common_test.go") {
-				t.Errorf("[1]Expected file to be common_test.go, got %q", file)
-			}
-			if err != "[1]TestHandlePanicMock Panic" {
-				t.Errorf("[1]Expected err to be TestHandlePanicMock Panic1, got %q", err)
-			}
-		})
-		panic("[1]TestHandlePanicMock Panic") // nolint
-	}()
-	wg1.Wait()
-
-	// 返回假的
-	currentGetPanicInfo = func(_ int) (file string, line int, ok bool) {
-		return "", 0, false
-	}
-	var wg2 sync.WaitGroup
-	wg2.Add(1)
-	go func() { // nolint
-		defer wg2.Done()
-		defer HandlePanic(func(file string, line int, err any) {
-			if file != "unknown" {
-				t.Errorf("[2]Expected file to be unknown, got %q", file)
-			}
-			if line != 0 {
-				t.Errorf("[2]Expected line to be 0, got %d", line)
-			}
-			if err != "[2]TestHandlePanicMock Panic" {
-				t.Errorf("[2]Expected err to be [2]TestHandlePanicMock Panic, got %q", err)
-			}
-		})
-		panic("[2]TestHandlePanicMock Panic") // nolint
-	}()
-	wg2.Wait()
 }
 
 func TestLogStr(t *testing.T) {

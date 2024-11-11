@@ -6,18 +6,11 @@ import (
 	"runtime"
 )
 
-type getPanicInfo func(skip int) (file string, line int, ok bool)
-
-var currentGetPanicInfo getPanicInfo = func(skip int) (file string, line int, ok bool) {
-	_, file, line, ok = runtime.Caller(skip + 1)
-	return
-}
-
 // Assert is used to assert a condition, if the condition is false, it will panic.
 // The panic message will contain the file and line number of the assertion, pointing to the Assert function position.
 func Assert(condition bool, message string) {
 	if !condition {
-		file, line, ok := currentGetPanicInfo(1)
+		_, file, line, ok := runtime.Caller(2) // situation of caller of Assert
 		if ok {
 			panic(fmt.Sprintf("%s:%d: %s", file, line, message)) // nolint
 		} else {
@@ -33,7 +26,7 @@ func Assert(condition bool, message string) {
 // pointing to the panic position.
 func HandlePanic(action func(file string, line int, err any)) {
 	if r := recover(); r != nil {
-		file, line, ok := currentGetPanicInfo(2)
+		_, file, line, ok := runtime.Caller(3) // situation of goroutine panic
 		if !ok {
 			file = "unknown"
 			line = 0
