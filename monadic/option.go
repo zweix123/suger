@@ -1,5 +1,7 @@
 package monadic
 
+// copy from https://github.com/andeya/gust/blob/main/option.go
+
 import "fmt"
 
 func Some[T any](t T) Option[T] {
@@ -13,8 +15,9 @@ func None[T any]() Option[T] {
 
 type Option[T any] struct {
 	value **T
-	// Why **T: Allows distinction between Some(*T(nil)) and None[*T]()
-	// Some(*T(nil)).IsSome() == true, Some(*T(nil)).Unwrap() == nil
+	// Why **T:
+	// 1. Allows distinction between Some(*T(nil)) and None[*T](): Some(*T(nil)).IsSome() == true, Some(*T(nil)).Unwrap() == nil
+	// 2. Default constructor of Option[T] is None[T]() in terms of behavior
 }
 
 func (o Option[T]) String() string {
@@ -41,5 +44,5 @@ func (o Option[T]) Unwrap() T {
 	if o.IsSome() {
 		return o.unwrapUnchecked()
 	}
-	panic(fmt.Sprintf("Unwrap called on a None value: %v", o))
+	panic(fmt.Sprintf("Unwrap called on a None value: %v", o)) // nolint
 }

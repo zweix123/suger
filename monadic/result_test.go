@@ -6,6 +6,25 @@ import (
 	"testing"
 )
 
+func TestResultDefaultConstructor(t *testing.T) {
+	// The result default constructor is special state, it's not ok and not err
+	type CustomType struct{}
+	var r Result[CustomType]
+	if r.IsOk() {
+		t.Errorf("expected IsOk to be false, got true")
+	}
+	if !r.IsErr() {
+		t.Errorf("expected IsErr to be false, got true")
+	}
+	v, e := r.Unwrap()
+	if v != (CustomType{}) {
+		t.Errorf("expected value to be %v, got %v", CustomType{}, v)
+	}
+	if e != ErrNotInitialized {
+		t.Errorf("expected error to be ErrNotInitialized, got %v", e)
+	}
+}
+
 func TestIsOkAndIsErr(t *testing.T) {
 	type C struct {
 		I int

@@ -7,6 +7,25 @@ import (
 	suger_test "github.com/zweix123/suger/test"
 )
 
+func TestOptionDefaultConstructor(t *testing.T) {
+	type CustomType struct{}
+	// The option default constructor is None
+	var o1 Option[CustomType]
+	if o1.IsSome() {
+		t.Errorf("expected isSome to be false")
+	}
+	if !o1.IsNone() {
+		t.Errorf("expected isNone to be true")
+	}
+	var o2 Option[*CustomType]
+	if o2.IsSome() {
+		t.Errorf("expected isSome to be false")
+	}
+	if !o2.IsNone() {
+		t.Errorf("expected isNone to be true")
+	}
+}
+
 func TestString(t *testing.T) {
 	type C struct {
 		I int
