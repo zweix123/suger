@@ -1,3 +1,7 @@
+/*
+ * Testing related functions, the code will be filled with panic, so it is not recommended for online services
+ */
+
 package test
 
 import (
@@ -37,7 +41,10 @@ func HandlePanic(f func()) string {
 		defer func() {
 			r := recover()
 			if r != nil {
-				fmt.Fprintf(buf, "%v", r)
+				_, err := fmt.Fprintf(buf, "%v", r)
+				if err != nil {
+					panic(err) // nolint
+				}
 			}
 		}()
 		f()

@@ -16,7 +16,7 @@ func TestHandleStdout(t *testing.T) {
 
 func TestHandlePanic(t *testing.T) {
 	panicMsg := HandlePanic(func() {
-		panic("TestHandlePanic")
+		panic("TestHandlePanic") // nolint
 	})
 	if panicMsg != "TestHandlePanic" {
 		t.Errorf("Expected panic message to be %q, but got %q", "TestHandlePanic", panicMsg)

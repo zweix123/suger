@@ -66,5 +66,5 @@ func (r Result[T]) Unwrap() (T, error) {
 		}
 		return zero, r.e
 	}
-	panic(ErrImpossibleBranch)
+	panic(ErrImpossibleBranch) // nolint
 }

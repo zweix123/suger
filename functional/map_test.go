@@ -79,7 +79,7 @@ func TestMapParallelWithGoroutineUpperLimitConcurrentSecurity(t *testing.T) {
 	for i, item := range mapSlice {
 		mapResult[i] = mapFunc(item, i)
 	}
-	checkMapResult := func(r []string) {
+	checkMapResult := func(t *testing.T, r []string) {
 		if len(r) != len(mapSlice) {
 			t.Errorf("expected length of r to be %d, got %d", len(mapSlice), len(r))
 		}
@@ -91,7 +91,7 @@ func TestMapParallelWithGoroutineUpperLimitConcurrentSecurity(t *testing.T) {
 	t.Run("param goroutineNum", func(t *testing.T) {
 		for i := 0; i <= len(mapSlice); i++ {
 			r := MapParallelWithGoroutineUpperLimit(mapSlice, mapFunc, i)
-			checkMapResult(r)
+			checkMapResult(t, r)
 		}
 	})
 
@@ -108,11 +108,11 @@ func TestMapParallelWithGoroutineUpperLimitConcurrentSecurity(t *testing.T) {
 		for i := 0; i <= len(mapSlice); i++ {
 			r := MapParallelWithGoroutineUpperLimit(mapSlice, func(item int, idx int) string {
 				if idx == 3 {
-					panic("panic")
+					panic("panic") // nolint
 				}
 				return mapFunc(item, idx)
 			}, i)
-			checkMapResult(r)
+			checkMapResult(t, r)
 		}
 	})
 
@@ -123,7 +123,7 @@ func TestMapParallelWithGoroutineUpperLimitConcurrentSecurity(t *testing.T) {
 				time.Sleep(time.Second)
 				return mapFunc(item, idx)
 			}, i)
-			checkMapResult(r)
+			checkMapResult(t, r)
 			t.Logf("goroutineNum: %d, latency: %s", i, time.Since(now))
 		}
 	})

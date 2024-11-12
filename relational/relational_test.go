@@ -27,7 +27,7 @@ func TestGroupBy(t *testing.T) {
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
-	nonempty := GroupBy(allStrings, func(i string) int {
+	nonempty := GroupBy(allStrings, func(_ string) int {
 		return 42
 	})
 	if reflect.TypeOf(nonempty[42]).String() != "relational.myStrings" {
