@@ -5,6 +5,8 @@ package monadic
 import (
 	"errors"
 	"fmt"
+
+	"github.com/zweix123/suger/common"
 )
 
 var (
@@ -26,18 +28,16 @@ type Result[T any] struct {
 }
 
 func (r Result[T]) String() string {
-	var zero T
 	if r.IsOk() {
-		return fmt.Sprintf("Ok[%T](%v)", zero, r.t.Unwrap())
+		return fmt.Sprintf("Ok[%T](%v)", common.Zero[T](), r.t.Unwrap())
 	}
 	if r.t.IsNone() {
-		var zero T
 		if r.e == nil {
-			return fmt.Sprintf("Err[%T](not initialized)", zero)
+			return fmt.Sprintf("Err[%T](not initialized)", common.Zero[T]())
 		}
-		return fmt.Sprintf("Err[%T](%v)", zero, r.e)
+		return fmt.Sprintf("Err[%T](%v)", common.Zero[T](), r.e)
 	}
-	return fmt.Sprintf("Err[%T](%v)", zero, ErrImpossibleBranch)
+	return fmt.Sprintf("Err[%T](%v)", common.Zero[T](), ErrImpossibleBranch)
 }
 
 /*
@@ -60,11 +60,10 @@ func (r Result[T]) Unwrap() (T, error) {
 		return r.t.Unwrap(), nil
 	}
 	if r.t.IsNone() {
-		var zero T
 		if r.e == nil {
-			return zero, ErrNotInitialized
+			return common.Zero[T](), ErrNotInitialized
 		}
-		return zero, r.e
+		return common.Zero[T](), r.e
 	}
 	panic(ErrImpossibleBranch) // nolint
 }

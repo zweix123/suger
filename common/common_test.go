@@ -155,3 +155,37 @@ func TestLogStr(t *testing.T) {
 		t.Errorf("LogStr(make(chan int)) = %q, want %q", LogStr(make(chan int)), "is unsupported type")
 	}
 }
+
+func TestZero(t *testing.T) {
+	// 1. base function
+	// 1.1 built-in type
+	if Zero[bool]() != false {
+		t.Errorf("Zero[bool]() = %t, want %t", Zero[bool](), false)
+	}
+	if Zero[int]() != 0 {
+		t.Errorf("Zero[int]() = %d, want %d", Zero[int](), 0)
+	}
+	if Zero[float64]() != 0.0 {
+		t.Errorf("Zero[float64]() = %f, want %f", Zero[float64](), 0.0)
+	}
+	if Zero[string]() != "" {
+		t.Errorf("Zero[string]() = %q, want %q", Zero[string](), "")
+	}
+	// 1.2 custom type
+	type Custom struct {
+		A int
+		B string
+	}
+	if Zero[Custom]().A != 0 {
+		t.Errorf("Zero[Custom]().A = %d, want %d", Zero[Custom]().A, 0)
+	}
+	if Zero[Custom]().B != "" {
+		t.Errorf("Zero[Custom]().B = %q, want %q", Zero[Custom]().B, "")
+	}
+	// 2. idempotent
+	first := Zero[Custom]()
+	second := Zero[Custom]()
+	if first != second {
+		t.Errorf("Zero[Custom]() = %v, want %v", first, second)
+	}
+}

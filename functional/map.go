@@ -52,28 +52,26 @@ func MapParallelWithGoroutineUpperLimit[T any, R any](collection []T, iteratee f
 
 	result = make([]R, len(collection))
 
-	goroutineLimit := make(chan struct{}, goroutineNum-1)
-	functionResult := make(chan struct{}, goroutineNum-1) // Currently only used for synchronization, it can be expanded if needed in the future
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, goroutineNum)
 
-	go func() {
-		defer close(goroutineLimit)
-		defer common.HandlePanic(func(_ string, _ int, _ any) {})
-
-		for i, item := range collection {
-			goroutineLimit <- struct{}{}
-			go func(_item T, _i int) {
-				defer common.HandlePanic(func(_ string, _ int, _ any) {})
-				defer func() {
-					functionResult <- struct{}{}
-				}()
-				result[_i] = iteratee(_item, _i)
-			}(item, i)
-		}
-	}()
-
-	for range goroutineLimit {
-		<-functionResult
+	for i, item := range collection {
+		wg.Add(1)
+		sem <- struct{}{}
+		go func(_item T, _i int) {
+			defer common.HandlePanic(func(_ string, _ int, _ any) {})
+			defer wg.Done()
+			defer func() {
+				<-sem
+			}()
+			defer common.HandlePanic(func(_ string, _ int, _ any) {
+				result[_i] = common.Zero[R]()
+			})
+			result[_i] = iteratee(_item, _i)
+		}(item, i)
 	}
+
+	wg.Wait()
 
 	return result
 }

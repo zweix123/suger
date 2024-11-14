@@ -28,8 +28,7 @@ func NewFuture[T any](promise func() (T, error)) *Future[T] {
 		defer close(f.done)
 		defer common.HandlePanic(func(_ string, _ int, r any) {
 			// if promise panic, the f.result and f.err not assigned correctly, so we need to assign them here
-			var zero T
-			f.result = zero
+			f.result = common.Zero[T]()
 			f.err = fmt.Errorf("%w: %v", ErrPanic, r)
 		})
 		f.result, f.err = promise()
@@ -50,7 +49,6 @@ func (f *Future[T]) GetWithTimeout(timeout time.Duration) (T, error) {
 	case <-f.done:
 		return f.result, f.err
 	case <-timer.C:
-		var zero T
-		return zero, ErrTimeout
+		return common.Zero[T](), ErrTimeout
 	}
 }

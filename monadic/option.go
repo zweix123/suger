@@ -2,7 +2,11 @@ package monadic
 
 // copy from https://github.com/andeya/gust/blob/main/option.go
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/zweix123/suger/common"
+)
 
 func Some[T any](t T) Option[T] {
 	v := &t
@@ -21,11 +25,10 @@ type Option[T any] struct {
 }
 
 func (o Option[T]) String() string {
-	var zero T
 	if o.IsNone() {
-		return fmt.Sprintf("None[%T]", zero)
+		return fmt.Sprintf("None[%T]", common.Zero[T]())
 	}
-	return fmt.Sprintf("Some[%T](%v)", zero, o.unwrapUnchecked())
+	return fmt.Sprintf("Some[%T](%v)", common.Zero[T](), o.unwrapUnchecked())
 }
 
 func (o Option[T]) unwrapUnchecked() T {

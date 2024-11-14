@@ -42,3 +42,7 @@ func LogStr(v interface{}) string {
 	}
 	return string(bytes)
 }
+
+func Zero[T any]() (zero T) {
+	return
+}
