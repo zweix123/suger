@@ -1,6 +1,20 @@
 package slice
 
 // copy from https://github.com/samber/lo/blob/master/slice.go
+// Filter iterates over elements of collection, returning an array of all elements predicate returns truthy for.
+func Filter[T any, Slice ~[]T](collection Slice, predicate func(item T, index int) bool) Slice {
+	result := make(Slice, 0, len(collection))
+
+	for i := range collection {
+		if predicate(collection[i], i) {
+			result = append(result, collection[i])
+		}
+	}
+
+	return result
+}
+
+// copy from https://github.com/samber/lo/blob/master/slice.go
 // Chunk returns an array of elements split into groups the length of size. If array can't be split evenly,
 // the final chunk will be the remaining elements.
 func Chunk[T any, Slice ~[]T](collection Slice, size int) []Slice {

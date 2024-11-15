@@ -13,6 +13,37 @@ import (
 	"testing"
 )
 
+func TestFilter(t *testing.T) {
+	r1 := Filter([]int{1, 2, 3, 4}, func(x int, _ int) bool {
+		return x%2 == 0
+	})
+	if len(r1) != 2 {
+		t.Errorf("expected length of r1 to be 2, got %d", len(r1))
+	}
+	if !reflect.DeepEqual(r1, []int{2, 4}) {
+		t.Errorf("expected r1 to be [2, 4], got %v", r1)
+	}
+
+	r2 := Filter([]string{"", "foo", "", "bar", ""}, func(x string, _ int) bool {
+		return len(x) > 0
+	})
+	if len(r2) != 2 {
+		t.Errorf("expected length of r2 to be 2, got %d", len(r2))
+	}
+	if !reflect.DeepEqual(r2, []string{"foo", "bar"}) {
+		t.Errorf("expected r2 to be [foo, bar], got %v", r2)
+	}
+
+	type myStrings []string
+	allStrings := myStrings{"", "foo", "bar"}
+	nonempty := Filter(allStrings, func(x string, _ int) bool {
+		return len(x) > 0
+	})
+	if _, ok := interface{}(nonempty).(myStrings); !ok {
+		t.Errorf("type preserved: expected nonempty to be of type []string, got %T", nonempty)
+	}
+}
+
 func TestChunk(t *testing.T) {
 	type args struct {
 		src  []int

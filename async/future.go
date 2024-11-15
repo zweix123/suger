@@ -1,4 +1,4 @@
-package snippet
+package async
 
 import (
 	"errors"
@@ -21,12 +21,13 @@ type Future[T any] struct {
 
 func NewFuture[T any](promise func() (T, error)) *Future[T] {
 	f := &Future[T]{
-		done: make(chan struct{}, 1),
+		done: make(chan struct{}),
 	}
 
 	go func() { // nolint
+		defer common.HandlePanic(func(_ string, _ int, r any, _ []byte) {})
 		defer close(f.done)
-		defer common.HandlePanic(func(_ string, _ int, r any) {
+		defer common.HandlePanic(func(_ string, _ int, r any, _ []byte) {
 			// if promise panic, the f.result and f.err not assigned correctly, so we need to assign them here
 			f.result = common.Zero[T]()
 			f.err = fmt.Errorf("%w: %v", ErrPanic, r)

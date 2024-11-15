@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -27,10 +28,49 @@ func TestAssertNotPanic(t *testing.T) {
 	Assert(true, "") // should not panic
 }
 
+func parse(output string) (file string, line int, message string, err error) {
+	// file:line: message
+	parts := strings.Split(output, ":")
+	if len(parts) != 3 {
+		return "", 0, output, fmt.Errorf("invalid panic message format: %q", output)
+	}
+	line, err = strconv.Atoi(parts[1])
+	if err != nil {
+		return "", 0, output, fmt.Errorf("invalid line number: %q", parts[1])
+	}
+	parts[2] = strings.TrimSpace(parts[2])
+	return parts[0], line, parts[2], nil
+}
+
+func TestAssertLine(t *testing.T) {
+	msg := "TestAssertLine Assert Flag"
+	defer func() {
+		r := recover()
+		if r == nil { // no panic
+			t.Errorf("Expected panic, but did not occur")
+		} else {
+			file, line, message, err := parse(fmt.Sprintf("%v", r))
+			if err != nil {
+				t.Errorf("Unexpected panic: %v", err)
+			}
+			if !strings.HasSuffix(file, "common/common_test.go") {
+				t.Errorf("Expected file to be %q, but got %q", "common/common_test.go", file)
+			}
+			if line != 67 {
+				t.Errorf("Expected line to be %d, but got %d", 66, line)
+			}
+			if message != msg {
+				t.Errorf("Expected message to be %q, but got %q", msg, message)
+			}
+		}
+	}()
+	Assert(false, msg)
+}
+
 func TestHandlePanic(t *testing.T) {
 	t.Run("No Panic", func(t *testing.T) {
 		actionCalled := false
-		HandlePanic(func(_ string, _ int, _ any) {
+		HandlePanic(func(_ string, _ int, _ any, _ []byte) {
 			actionCalled = true
 		})
 		if actionCalled {
@@ -45,7 +85,7 @@ func TestHandlePanic(t *testing.T) {
 		wg.Add(1)
 		go func() { // nolint
 			defer wg.Done()
-			defer HandlePanic(func(_ string, _ int, _ any) {
+			defer HandlePanic(func(_ string, _ int, _ any, _ []byte) {
 				actionCalled = true
 			})
 			panic("panic") // nolint
@@ -64,7 +104,7 @@ func TestHandlePanic(t *testing.T) {
 		wg.Add(1)
 		func() {
 			defer wg.Done()
-			defer HandlePanic(func(_ string, _ int, _ any) {
+			defer HandlePanic(func(_ string, _ int, _ any, _ []byte) {
 				actionCalled = true
 			})
 			panic("panic") // nolint
@@ -77,24 +117,81 @@ func TestHandlePanic(t *testing.T) {
 	})
 }
 
-func TestHandlePanicOutput(t *testing.T) {
-	msg := "TestHandlePanicOutput Panic"
+func TestHandlePanicOutput1(t *testing.T) {
+	msg := "TestHandlePanicOutput1 Panic"
 
 	buf := test.HandleStdout(func() {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		go func() { // nolint
 			defer wg.Done()
-			defer HandlePanic(func(_ string, _ int, err any) {
-				fmt.Printf("%v", err)
+			defer HandlePanic(func(file string, line int, err any, _ []byte) {
+				fmt.Printf("%s:%d: %v", file, line, err)
 			})
 			panic(msg) // nolint
 		}()
 		wg.Wait()
 	})
 
-	if buf.String() != msg {
-		t.Errorf("Expected output to be %q, but got %q", msg, buf.String())
+	file, line, message, err := parse(buf.String())
+	if err != nil {
+		t.Errorf("Unexpected panic: %v", err)
+	}
+	if !strings.HasSuffix(file, "common/common_test.go") {
+		t.Errorf("Expected file to be %q, but got %q", "common/common_test.go", file)
+	}
+	if line != 131 {
+		t.Errorf("Expected line to be %d, but got %d", 131, line)
+	}
+	if message != msg {
+		t.Errorf("Expected message to be %q, but got %q", msg, message)
+	}
+}
+
+func TestHandlePanicOutput2(t *testing.T) {
+	msg := "TestHandlePanicOutput2 Panic"
+
+	buf := test.HandleStdout(func() {
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() { // nolint
+			defer wg.Done()
+			defer HandlePanic(func(_ string, _ int, _ any, stack []byte) {
+				fmt.Printf("%s", string(stack))
+			})
+			panic(msg) // nolint
+		}()
+		wg.Wait()
+	})
+
+	lines := strings.Split(buf.String(), "\n")
+	check := func() bool {
+		if len(lines) != 10 {
+			fmt.Println(len(lines))
+			return false
+		}
+		if !strings.HasSuffix(lines[0], "[running]:") {
+			fmt.Printf("lines[0]: %q\n", lines[0])
+			return false
+		}
+		if !strings.Contains(lines[1], "/suger/common.HandlePanic") {
+			fmt.Printf("lines[1]: %q\n", lines[1])
+			return false
+		}
+		if !strings.Contains(lines[2], "/suger/common/common.go:36") {
+			fmt.Printf("lines[2]: %q\n", lines[2])
+			return false
+		}
+		if !strings.Contains(lines[5], "/suger/common.TestHandlePanicOutput2.func1.1()") {
+			fmt.Printf("lines[5]: %q\n", lines[5])
+			return false
+		}
+		return true
+	}()
+	if !check {
+		for idx, line := range lines {
+			t.Error(idx, line)
+		}
 	}
 }
 
