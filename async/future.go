@@ -25,7 +25,7 @@ func NewFuture[T any](promise func() (T, error)) *Future[T] {
 	}
 
 	go func() { // nolint
-		defer common.HandlePanic(func(_ string, _ int, r any, _ []byte) {})
+		defer common.HandlePanic(func(_ string, _ int, _ any, _ []byte) {})
 		defer close(f.done)
 		defer common.HandlePanic(func(_ string, _ int, r any, _ []byte) {
 			// if promise panic, the f.result and f.err not assigned correctly, so we need to assign them here
