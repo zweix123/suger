@@ -39,7 +39,7 @@ func HandlePanic(action func(file string, line int, err any, stack []byte)) {
 	}
 }
 
-func LogStr(v interface{}) string {
+func MustJsonMarshal(v interface{}) string {
 	bytes, err := json.Marshal(v)
 	if err != nil {
 		return fmt.Sprintf("%T is unsupported type: %v", v, v)

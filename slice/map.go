@@ -1,4 +1,4 @@
-package functional
+package slice
 
 import (
 	"sync"

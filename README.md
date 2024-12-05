@@ -36,26 +36,32 @@ go get -u github.com/zweix123/suger
 
 ## Usage
 
-+ [async](./async)
-  + `Future`
 + [common](./common)
   + `Assert`
   + `HandlePanic`
+  + `MustJsonMarshal`
+  + `Zero`
 + [dict](./dict)
   + `Contains`
   + `Keys`
   + `Values`
-+ [functional](./functional)
-  + `MapSerial`
-  + `MapParallel`
-  + `MapParallelWithLimit`
-  + `Reduce`
-  + `Filter`
 + [slice](./slice)
   + `Contains`
-  + `Equal`
   + `Reverse`
   + `Uniq`
 
-  + `Chunk`
-  + `Flatten`
+  + functional
+
+    + `Chunk`
+    + `Flatten`
+
+    + `Times`
+    + `All`
+    + `Any`
+
+    + `MapSerial`
+    + `MapParallel`
+    + `MapParallelWithLimit`
++ [monadic](./monadic)
+  + `Result`
+  + `Option`

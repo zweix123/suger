@@ -1,4 +1,4 @@
-package relational
+package slice
 
 // copy from https://github.com/samber/lo/blob/master/slice.go
 // GroupBy returns an object composed of keys generated from the results of running each element of collection through iteratee.

@@ -51,10 +51,13 @@ func (r Result[T]) IsOk() bool {
 	return r.t.IsSome() && r.e == nil
 }
 
+// IsErr returns true if the result is an error, including not initialized and unknown situations
 func (r Result[T]) IsErr() bool {
 	return !r.IsOk()
 }
 
+// Unwrap returns the value and error of the result
+// Compared to IsErr, if Err, it will return the specific reason for the error
 func (r Result[T]) Unwrap() (T, error) {
 	if r.IsOk() {
 		return r.t.Unwrap(), nil
