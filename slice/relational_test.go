@@ -30,7 +30,7 @@ func TestGroupBy(t *testing.T) {
 	nonempty := GroupBy(allStrings, func(_ string) int {
 		return 42
 	})
-	if reflect.TypeOf(nonempty[42]).String() != "relational.myStrings" {
-		t.Errorf("expected type of nonempty[42] to be relational.myStrings, got %v", reflect.TypeOf(nonempty[42]))
+	if reflect.TypeOf(nonempty[42]).String() != "slice.myStrings" {
+		t.Errorf("expected type of nonempty[42] to be slice.myStrings, got %v", reflect.TypeOf(nonempty[42]))
 	}
 }
