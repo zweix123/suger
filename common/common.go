@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"runtime"
+	"runtime/debug"
 )
 
 // Assert is used to assert a condition, if the condition is false, it will panic.
@@ -32,10 +33,7 @@ func HandlePanic(action func(file string, line int, err any, stack []byte)) {
 			line = 0
 		}
 
-		buf := make([]byte, 1024)
-		n := runtime.Stack(buf, false)
-
-		action(file, line, r, buf[:n])
+		action(file, line, r, debug.Stack())
 	}
 }
 

@@ -166,7 +166,7 @@ func TestHandlePanicOutput2(t *testing.T) {
 
 	lines := strings.Split(buf.String(), "\n")
 	check := func() bool {
-		if len(lines) != 10 {
+		if len(lines) != 12 {
 			fmt.Println(len(lines))
 			return false
 		}
@@ -174,16 +174,16 @@ func TestHandlePanicOutput2(t *testing.T) {
 			fmt.Printf("lines[0]: %q\n", lines[0])
 			return false
 		}
-		if !strings.Contains(lines[1], "/suger/common.HandlePanic") {
-			fmt.Printf("lines[1]: %q\n", lines[1])
+		if !strings.Contains(lines[3], "/suger/common.HandlePanic") {
+			fmt.Printf("lines[3]: %q\n", lines[3])
 			return false
 		}
-		if !strings.Contains(lines[2], "/suger/common/common.go:36") {
-			fmt.Printf("lines[2]: %q\n", lines[2])
+		if !strings.Contains(lines[4], "/suger/common/common.go:36") {
+			fmt.Printf("lines[4]: %q\n", lines[4])
 			return false
 		}
-		if !strings.Contains(lines[5], "/suger/common.TestHandlePanicOutput2.func1.1()") {
-			fmt.Printf("lines[5]: %q\n", lines[5])
+		if !strings.Contains(lines[7], "/suger/common.TestHandlePanicOutput2.func1.1()") {
+			fmt.Printf("lines[7]: %q\n", lines[7])
 			return false
 		}
 		return true
