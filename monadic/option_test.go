@@ -1,29 +1,22 @@
 package monadic
 
 import (
-	"reflect"
 	"testing"
 
-	suger_test "github.com/zweix123/suger/test"
+	"github.com/stretchr/testify/assert"
+	"github.com/zweix123/suger/testify"
 )
 
 func TestOptionDefaultConstructor(t *testing.T) {
 	type CustomType struct{}
 	// The option default constructor is None
 	var o1 Option[CustomType]
-	if o1.IsSome() {
-		t.Errorf("expected isSome to be false")
-	}
-	if !o1.IsNone() {
-		t.Errorf("expected isNone to be true")
-	}
+	assert.False(t, o1.IsSome())
+	assert.True(t, o1.IsNone())
+
 	var o2 Option[*CustomType]
-	if o2.IsSome() {
-		t.Errorf("expected isSome to be false")
-	}
-	if !o2.IsNone() {
-		t.Errorf("expected isNone to be true")
-	}
+	assert.False(t, o2.IsSome())
+	assert.True(t, o2.IsNone())
 }
 
 func TestOptionString(t *testing.T) {
@@ -50,9 +43,7 @@ func TestOptionString(t *testing.T) {
 	}
 
 	check := func(optionString, expectedString string) {
-		if optionString != expectedString {
-			t.Errorf("expected %s, got %s", expectedString, optionString)
-		}
+		assert.Equal(t, expectedString, optionString)
 	}
 
 	for _, test := range tests {
@@ -67,7 +58,7 @@ func TestOptionString(t *testing.T) {
 			case Option[C]:
 				check(o.String(), test.s)
 			default:
-				t.Errorf("expected option, got %T", o)
+				assert.Fail(t, "expected option, got %T", o)
 			}
 		})
 	}
@@ -98,12 +89,8 @@ func TestIsSomeAndIsNone(t *testing.T) {
 	}
 
 	check := func(isSome bool, isNone bool, expectedIsSome bool, expectedIsNone bool) {
-		if isSome != expectedIsSome {
-			t.Errorf("expected isSome to be %t, got %t", expectedIsSome, isSome)
-		}
-		if isNone != expectedIsNone {
-			t.Errorf("expected isNone to be %t, got %t", expectedIsNone, isNone)
-		}
+		assert.Equal(t, expectedIsSome, isSome)
+		assert.Equal(t, expectedIsNone, isNone)
 	}
 
 	for _, test := range tests {
@@ -118,7 +105,7 @@ func TestIsSomeAndIsNone(t *testing.T) {
 			case Option[C]:
 				check(o.IsSome(), o.IsNone(), test.isSome, test.isNone)
 			default:
-				t.Errorf("expected option, got %T", o)
+				assert.Fail(t, "expected option, got %T", o)
 			}
 		})
 	}
@@ -144,9 +131,7 @@ func TestSomeUnwrap(t *testing.T) {
 	}
 
 	check := func(value interface{}, expectedValue interface{}) {
-		if !reflect.DeepEqual(value, expectedValue) {
-			t.Errorf("expected value to be %v, got %v", expectedValue, value)
-		}
+		assert.Equal(t, expectedValue, value)
 	}
 
 	for _, test := range tests {
@@ -161,7 +146,7 @@ func TestSomeUnwrap(t *testing.T) {
 			case Option[C]:
 				check(o.Unwrap(), test.value)
 			default:
-				t.Errorf("expected option, got %T", o)
+				assert.Fail(t, "expected option, got %T", o)
 			}
 		})
 	}
@@ -187,24 +172,22 @@ func TestNoneUnwrap(t *testing.T) {
 	}
 
 	check := func(panicMsg string, expectedPanicMsg string) {
-		if panicMsg != expectedPanicMsg {
-			t.Errorf("expected panic message to be %s, got %s", expectedPanicMsg, panicMsg)
-		}
+		assert.Equal(t, expectedPanicMsg, panicMsg)
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			switch o := test.o.(type) {
 			case Option[int]:
-				check(suger_test.HandlePanic(func() { o.Unwrap() }), test.panicMsg)
+				check(testify.HandlePanic(func() { o.Unwrap() }), test.panicMsg)
 			case Option[float64]:
-				check(suger_test.HandlePanic(func() { o.Unwrap() }), test.panicMsg)
+				check(testify.HandlePanic(func() { o.Unwrap() }), test.panicMsg)
 			case Option[string]:
-				check(suger_test.HandlePanic(func() { o.Unwrap() }), test.panicMsg)
+				check(testify.HandlePanic(func() { o.Unwrap() }), test.panicMsg)
 			case Option[C]:
-				check(suger_test.HandlePanic(func() { o.Unwrap() }), test.panicMsg)
+				check(testify.HandlePanic(func() { o.Unwrap() }), test.panicMsg)
 			default:
-				t.Errorf("expected option, got %T", o)
+				assert.Fail(t, "expected option, got %T", o)
 			}
 		})
 	}
@@ -218,14 +201,8 @@ func TestPointer(t *testing.T) {
 		S string
 	}
 	some := Some[*C](nil)
-	if !some.IsSome() {
-		t.Errorf("expected some to be some")
-	}
-	if some.IsNone() {
-		t.Errorf("expected some to be none")
-	}
+	assert.True(t, some.IsSome())
+	assert.False(t, some.IsNone())
 	value := some.Unwrap()
-	if value != nil {
-		t.Errorf("expected value to be nil")
-	}
+	assert.Nil(t, value)
 }

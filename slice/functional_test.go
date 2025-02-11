@@ -12,72 +12,64 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTimes(t *testing.T) {
 	result1 := Times(3, func(i int) string {
 		return strconv.FormatInt(int64(i), 10)
 	})
-	if len(result1) != 3 || !reflect.DeepEqual(result1, []string{"0", "1", "2"}) {
-		t.Errorf("expected result1 to be [0, 1, 2], got %v", result1)
-	}
+	assert.Equal(t, []string{"0", "1", "2"}, result1)
 }
 
 func TestAll(t *testing.T) {
-	if !All([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
-		return x > 0
-	}) {
-		t.Errorf("expected All to be true")
-	}
-	if All([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
-		return x > 3
-	}) {
-		t.Errorf("expected All to be false")
-	}
+	assert.True(
+		t,
+		All([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
+			return x > 0
+		}),
+	)
+	assert.False(
+		t,
+		All([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
+			return x > 3
+		}),
+	)
 }
 
 func TestAny(t *testing.T) {
-	if !Any([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
-		return x > 3
-	}) {
-		t.Errorf("expected Any to be true")
-	}
-	if Any([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
-		return x > 5
-	}) {
-		t.Errorf("expected Any to be false")
-	}
+	assert.True(
+		t,
+		Any([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
+			return x > 3
+		}),
+	)
+	assert.False(
+		t,
+		Any([]int{1, 2, 3, 4, 5}, func(x int, _ int) bool {
+			return x > 5
+		}),
+	)
 }
 
 func TestFilter(t *testing.T) {
 	r1 := Filter([]int{1, 2, 3, 4}, func(x int, _ int) bool {
 		return x%2 == 0
 	})
-	if len(r1) != 2 {
-		t.Errorf("expected length of r1 to be 2, got %d", len(r1))
-	}
-	if !reflect.DeepEqual(r1, []int{2, 4}) {
-		t.Errorf("expected r1 to be [2, 4], got %v", r1)
-	}
+	assert.Equal(t, []int{2, 4}, r1)
 
 	r2 := Filter([]string{"", "foo", "", "bar", ""}, func(x string, _ int) bool {
 		return len(x) > 0
 	})
-	if len(r2) != 2 {
-		t.Errorf("expected length of r2 to be 2, got %d", len(r2))
-	}
-	if !reflect.DeepEqual(r2, []string{"foo", "bar"}) {
-		t.Errorf("expected r2 to be [foo, bar], got %v", r2)
-	}
+	assert.Equal(t, []string{"foo", "bar"}, r2)
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
 	nonempty := Filter(allStrings, func(x string, _ int) bool {
 		return len(x) > 0
 	})
-	if _, ok := interface{}(nonempty).(myStrings); !ok {
-		t.Errorf("type preserved: expected nonempty to be of type []string, got %T", nonempty)
-	}
+	assert.IsType(t, myStrings{}, nonempty)
 }
 
 func TestChunk(t *testing.T) {
@@ -112,29 +104,21 @@ func TestChunk(t *testing.T) {
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
 	nonempty := Chunk(allStrings, 2)
-	if reflect.TypeOf(nonempty[0]) != reflect.TypeOf(allStrings) {
-		t.Errorf("type not preserved")
-	}
+	assert.IsType(t, allStrings, nonempty[0])
 
 	// appending to a chunk should not affect original array
 	originalArray := []int{0, 1, 2, 3, 4, 5}
 	result := Chunk(originalArray, 2)
 	result[0] = append(result[0], 6)
-	if !reflect.DeepEqual(originalArray, []int{0, 1, 2, 3, 4, 5}) {
-		t.Errorf("original array is affected")
-	}
+	assert.Equal(t, []int{0, 1, 2, 3, 4, 5}, originalArray)
 }
 
 func TestFlatten(t *testing.T) {
 	result1 := Flatten([][]int{{0, 1}, {2, 3, 4, 5}})
-	if !reflect.DeepEqual(result1, []int{0, 1, 2, 3, 4, 5}) {
-		t.Errorf("Flatten() = %v, want %v", result1, []int{0, 1, 2, 3, 4, 5})
-	}
+	assert.Equal(t, []int{0, 1, 2, 3, 4, 5}, result1)
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
 	nonempty := Flatten([]myStrings{allStrings})
-	if reflect.TypeOf(nonempty) != reflect.TypeOf(allStrings) {
-		t.Errorf("type not preserved")
-	}
+	assert.IsType(t, allStrings, nonempty)
 }

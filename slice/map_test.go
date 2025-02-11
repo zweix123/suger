@@ -1,73 +1,47 @@
 package slice
 
 import (
-	"reflect"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMapSerial(t *testing.T) {
 	result1 := MapSerial([]int{1, 2, 3, 4}, func(_ int, _ int) string {
 		return "Hello"
 	})
-	if len(result1) != 4 {
-		t.Errorf("expected length of result1 to be 4, got %d", len(result1))
-	}
-	if result1[0] != "Hello" || result1[1] != "Hello" || result1[2] != "Hello" || result1[3] != "Hello" {
-		t.Errorf("expected result1 to be [Hello, Hello, Hello, Hello], got %v", result1)
-	}
+	assert.Equal(t, 4, len(result1))
+	assert.Equal(t, []string{"Hello", "Hello", "Hello", "Hello"}, result1)
 	result2 := MapSerial([]int64{1, 2, 3, 4}, func(x int64, _ int) string {
 		return strconv.FormatInt(x, 10)
 	})
-	if len(result2) != 4 {
-		t.Errorf("expected length of result2 to be 4, got %d", len(result2))
-	}
-	if result2[0] != "1" || result2[1] != "2" || result2[2] != "3" || result2[3] != "4" {
-		t.Errorf("expected result2 to be [1, 2, 3, 4], got %v", result2)
-	}
+	assert.Equal(t, []string{"1", "2", "3", "4"}, result2)
 }
 
 func TestMapParallel(t *testing.T) {
 	result1 := MapParallel([]int{1, 2, 3, 4}, func(_ int, _ int) string {
 		return "Hello"
 	})
-	if len(result1) != 4 {
-		t.Errorf("expected length of result1 to be 4, got %d", len(result1))
-	}
-	if !reflect.DeepEqual(result1, []string{"Hello", "Hello", "Hello", "Hello"}) {
-		t.Errorf("expected result1 to be [Hello, Hello, Hello, Hello], got %v", result1)
-	}
+	assert.Equal(t, 4, len(result1))
+	assert.Equal(t, []string{"Hello", "Hello", "Hello", "Hello"}, result1)
 	result2 := MapParallel([]int64{1, 2, 3, 4}, func(x int64, _ int) string {
 		return strconv.FormatInt(x, 10)
 	})
-	if len(result2) != 4 {
-		t.Errorf("expected length of result2 to be 4, got %d", len(result2))
-	}
-	if !reflect.DeepEqual(result2, []string{"1", "2", "3", "4"}) {
-		t.Errorf("expected result2 to be [1, 2, 3, 4], got %v", result2)
-	}
+	assert.Equal(t, []string{"1", "2", "3", "4"}, result2)
 }
 
 func TestMapParallelWithGoroutineUpperLimit(t *testing.T) {
 	result1 := MapParallelWithGoroutineUpperLimit([]int{1, 2, 3, 4}, func(_ int, _ int) string {
 		return "Hello"
 	}, 2)
-	if len(result1) != 4 {
-		t.Errorf("expected length of result1 to be 4, got %d", len(result1))
-	}
-	if !reflect.DeepEqual(result1, []string{"Hello", "Hello", "Hello", "Hello"}) {
-		t.Errorf("expected result1 to be [Hello, Hello, Hello, Hello], got %v", result1)
-	}
+	assert.Equal(t, 4, len(result1))
+	assert.Equal(t, []string{"Hello", "Hello", "Hello", "Hello"}, result1)
 	result2 := MapParallelWithGoroutineUpperLimit([]int64{1, 2, 3, 4}, func(x int64, _ int) string {
 		return strconv.FormatInt(x, 10)
 	}, 2)
-	if len(result2) != 4 {
-		t.Errorf("expected length of result2 to be 4, got %d", len(result2))
-	}
-	if !reflect.DeepEqual(result2, []string{"1", "2", "3", "4"}) {
-		t.Errorf("expected result2 to be [1, 2, 3, 4], got %v", result2)
-	}
+	assert.Equal(t, []string{"1", "2", "3", "4"}, result2)
 }
 
 func TestMapParallelWithGoroutineUpperLimitConcurrentSecurity(t *testing.T) {
@@ -80,12 +54,8 @@ func TestMapParallelWithGoroutineUpperLimitConcurrentSecurity(t *testing.T) {
 		mapResult[i] = mapFunc(item, i)
 	}
 	checkMapResult := func(t *testing.T, r []string) {
-		if len(r) != len(mapSlice) {
-			t.Errorf("expected length of r to be %d, got %d", len(mapSlice), len(r))
-		}
-		if !reflect.DeepEqual(r, mapResult) {
-			t.Errorf("expected r to be %v, got %v", mapResult, r)
-		}
+		assert.Equal(t, len(r), len(mapSlice))
+		assert.Equal(t, r, mapResult)
 	}
 
 	t.Run("param goroutineNum", func(t *testing.T) {

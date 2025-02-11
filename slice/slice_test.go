@@ -1,8 +1,9 @@
 package slice
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestContains(t *testing.T) {
@@ -22,9 +23,7 @@ func TestContains(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Contains(tt.args.l, tt.args.e); got != tt.want {
-				t.Errorf("Contain() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, Contains(tt.args.l, tt.args.e), tt.want)
 		})
 	}
 }
@@ -46,9 +45,7 @@ func TestReverse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Reverse(tt.args.src); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Reverse() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, Reverse(tt.args.src), tt.want)
 		})
 	}
 }
@@ -72,9 +69,7 @@ func TestUniq(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Uniq(tt.args.src); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Uniq() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, Uniq(tt.args.src), tt.want)
 		})
 	}
 }

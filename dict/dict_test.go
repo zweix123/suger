@@ -3,27 +3,21 @@ package dict
 import (
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestContains(t *testing.T) {
 	m1 := map[string]string{}
 	m1["key1"] = "value1"
-	if !Contains(m1, "key1") {
-		t.Errorf("Contain should return true")
-	}
-	if Contains(m1, "key2") {
-		t.Errorf("Contain should return false")
-	}
+	assert.True(t, Contains(m1, "key1"))
+	assert.False(t, Contains(m1, "key2"))
 
 	var m2 map[string]string = nil
-	if Contains(m2, "key1") {
-		t.Errorf("Contain should return false")
-	}
+	assert.False(t, Contains(m2, "key1"))
 
 	var m3 map[string]string = make(map[string]string)
-	if Contains(m3, "key1") {
-		t.Errorf("Contain should return false")
-	}
+	assert.False(t, Contains(m3, "key1"))
 }
 
 func TestKeys(t *testing.T) {
@@ -32,25 +26,17 @@ func TestKeys(t *testing.T) {
 	m1["key2"] = "value2"
 	m1["key1"] = "value1"
 	keys := Keys(m1)
-	if len(keys) != 3 {
-		t.Errorf("Keys should return 3 keys")
-	}
+	assert.Equal(t, 3, len(keys))
 	sort.Strings(keys)
-	if keys[0] != "key1" || keys[1] != "key2" || keys[2] != "key3" {
-		t.Errorf("Keys should return key1, key2, key3")
-	}
+	assert.Equal(t, []string{"key1", "key2", "key3"}, keys)
 
 	var m2 map[string]string = nil
 	keys = Keys(m2)
-	if len(keys) != 0 {
-		t.Errorf("Keys should return 0 keys")
-	}
+	assert.Equal(t, 0, len(keys))
 
 	var m3 map[string]string = make(map[string]string)
 	keys = Keys(m3)
-	if len(keys) != 0 {
-		t.Errorf("Keys should return 0 keys")
-	}
+	assert.Equal(t, 0, len(keys))
 }
 
 func TestValues(t *testing.T) {
@@ -59,23 +45,15 @@ func TestValues(t *testing.T) {
 	m1["key2"] = "value2"
 	m1["key1"] = "value1"
 	values := Values(m1)
-	if len(values) != 3 {
-		t.Errorf("Values should return 3 values")
-	}
+	assert.Equal(t, 3, len(values))
 	sort.Strings(values)
-	if values[0] != "value1" || values[1] != "value2" || values[2] != "value3" {
-		t.Errorf("Values should return value1, value2, value3")
-	}
+	assert.Equal(t, []string{"value1", "value2", "value3"}, values)
 
 	var m2 map[string]string = nil
 	values = Values(m2)
-	if len(values) != 0 {
-		t.Errorf("Values should return 0 values")
-	}
+	assert.Equal(t, 0, len(values))
 
 	var m3 map[string]string = make(map[string]string)
 	values = Values(m3)
-	if len(values) != 0 {
-		t.Errorf("Values should return 0 values")
-	}
+	assert.Equal(t, 0, len(values))
 }

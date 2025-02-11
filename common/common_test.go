@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/zweix123/suger/test"
+	"github.com/zweix123/suger/testify"
 )
 
 func TestAssertPanic(t *testing.T) {
@@ -120,7 +120,7 @@ func TestHandlePanic(t *testing.T) {
 func TestHandlePanicOutput1(t *testing.T) {
 	msg := "TestHandlePanicOutput1 Panic"
 
-	buf := test.HandleStdout(func() {
+	buf := testify.HandleStdout(func() {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		go func() { // nolint
@@ -151,7 +151,7 @@ func TestHandlePanicOutput1(t *testing.T) {
 func TestHandlePanicOutput2(t *testing.T) {
 	msg := "TestHandlePanicOutput2 Panic"
 
-	buf := test.HandleStdout(func() {
+	buf := testify.HandleStdout(func() {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		go func() { // nolint

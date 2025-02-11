@@ -3,48 +3,35 @@ package monadic
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestResultDefaultConstructor(t *testing.T) {
 	// The result default constructor is special state, it's not ok and not err
 	type CustomType struct{}
 	var r Result[CustomType]
-	if r.IsOk() {
-		t.Errorf("expected IsOk to be false, got true")
-	}
-	if !r.IsErr() {
-		t.Errorf("expected IsErr to be false, got true")
-	}
+	assert.False(t, r.IsOk())
+	assert.True(t, r.IsErr())
 	v, e := r.Unwrap()
-	if v != (CustomType{}) {
-		t.Errorf("expected value to be %v, got %v", CustomType{}, v)
-	}
-	if e != ErrNotInitialized {
-		t.Errorf("expected error to be ErrNotInitialized, got %v", e)
-	}
+	assert.Equal(t, CustomType{}, v)
+	assert.Equal(t, ErrNotInitialized, e)
 }
 
 func TestResultString(t *testing.T) {
 	t.Run("not initialized", func(t *testing.T) {
 		var r Result[int]
-		if r.String() != "Err[int](not initialized)" {
-			t.Errorf("expected string to be Err[int](not initialized), got %v", r.String())
-		}
+		assert.Equal(t, "Err[int](not initialized)", r.String())
 	})
 	t.Run("ok", func(t *testing.T) {
 		r := Ok(1)
-		if r.String() != "Ok[int](1)" {
-			t.Errorf("expected string to be Ok[int](1), got %v", r.String())
-		}
+		assert.Equal(t, "Ok[int](1)", r.String())
 	})
 	t.Run("err", func(t *testing.T) {
 		e := errors.New("error")
 		r := Err[int](e)
-		if r.String() != fmt.Sprintf("Err[int](%v)", e) {
-			t.Errorf("expected string to be Err[int](%v), got %v", e, r.String())
-		}
+		assert.Equal(t, fmt.Sprintf("Err[int](%v)", e), r.String())
 	})
 }
 
@@ -74,12 +61,8 @@ func TestIsOkAndIsErr(t *testing.T) {
 	}
 
 	check := func(isOk, isErr, expectIsOk, expectIsErr bool) {
-		if isOk != expectIsOk {
-			t.Errorf("expected IsOk to be %v, got %v", expectIsOk, isOk)
-		}
-		if isErr != expectIsErr {
-			t.Errorf("expected IsErr to be %v, got %v", expectIsErr, isErr)
-		}
+		assert.Equal(t, expectIsOk, isOk)
+		assert.Equal(t, expectIsErr, isErr)
 	}
 
 	for _, test := range tests {
@@ -94,7 +77,7 @@ func TestIsOkAndIsErr(t *testing.T) {
 			case Result[C]:
 				check(r.IsOk(), r.IsErr(), test.isOk, test.isErr)
 			default:
-				t.Errorf("unexpected type: %T", r)
+				assert.Fail(t, "unexpected type: %T", r)
 			}
 		})
 	}
@@ -126,12 +109,8 @@ func TestUnwrap(t *testing.T) {
 	}
 
 	check := func(v interface{}, e error, expectV interface{}, expectE error) {
-		if !reflect.DeepEqual(v, expectV) {
-			t.Errorf("expected value to be %v, got %v", expectV, v)
-		}
-		if e != expectE {
-			t.Errorf("expected error to be %v, got %v", expectE, e)
-		}
+		assert.Equal(t, expectV, v)
+		assert.Equal(t, expectE, e)
 	}
 
 	for _, test := range tests {
@@ -150,7 +129,7 @@ func TestUnwrap(t *testing.T) {
 				v, e := r.Unwrap()
 				check(v, e, test.v, test.e)
 			default:
-				t.Errorf("unexpected type: %T", r)
+				assert.Fail(t, "unexpected type: %T", r)
 			}
 		})
 	}

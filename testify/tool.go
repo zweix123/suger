@@ -1,8 +1,8 @@
 /*
- * Testing related functions, the code will be filled with panic, so it is not recommended for online services
+ * Testing utility methods, the code will be filled with panic, so it is not recommended for online services.
  */
 
-package test
+package testify
 
 import (
 	"bytes"
@@ -11,9 +11,9 @@ import (
 )
 
 func HandleStdout(f func()) (buf bytes.Buffer) {
-	old := os.Stdout
+	tmp := os.Stdout
 	defer func() {
-		os.Stdout = old
+		os.Stdout = tmp
 	}()
 
 	r, w, err := os.Pipe()

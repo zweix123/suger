@@ -1,8 +1,9 @@
 package slice
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGroupBy(t *testing.T) {
@@ -13,24 +14,26 @@ func TestGroupBy(t *testing.T) {
 	if len(result1) != 3 {
 		t.Errorf("expected result1 to be 3, got %v", len(result1))
 	}
-	if !reflect.DeepEqual(result1, map[int][]int{
-		0: {0, 3},
-		1: {1, 4},
-		2: {2, 5},
-	}) {
-		t.Errorf("expected result1 to be %v, got %v", map[int][]int{
+	assert.Equal(
+		t,
+		map[int][]int{
 			0: {0, 3},
 			1: {1, 4},
 			2: {2, 5},
-		}, result1)
-	}
+		},
+		result1,
+	)
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
 	nonempty := GroupBy(allStrings, func(_ string) int {
 		return 42
 	})
-	if reflect.TypeOf(nonempty[42]).String() != "slice.myStrings" {
-		t.Errorf("expected type of nonempty[42] to be slice.myStrings, got %v", reflect.TypeOf(nonempty[42]))
-	}
+	assert.Equal(
+		t,
+		map[int]myStrings{
+			42: {"", "foo", "bar"},
+		},
+		nonempty,
+	)
 }
