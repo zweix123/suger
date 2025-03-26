@@ -1,6 +1,7 @@
 package slice
 
 import (
+	"fmt"
 	"strconv"
 	"testing"
 	"time"
@@ -96,5 +97,29 @@ func TestMapParallelWithGoroutineUpperLimitConcurrentSecurity(t *testing.T) {
 			checkMapResult(t, r)
 			t.Logf("goroutineNum: %d, latency: %s", i, time.Since(now))
 		}
+	})
+
+	t.Run("modify", func(t *testing.T) {
+		src := []map[string]int{
+			{
+				"a": 1,
+			},
+			{
+				"b": 2,
+			},
+			{
+				"c": 3,
+			},
+		}
+		mapFunc := func(m map[string]int, _ int) string {
+			time.Sleep(time.Second)
+			var s string
+			for k, v := range m {
+				s += fmt.Sprintf("%s%d", k, v)
+			}
+			return s
+		}
+		dst := MapParallelWithGoroutineUpperLimit(src, mapFunc, 1)
+		assert.Equal(t, []string{"a1", "b2", "c3"}, dst)
 	})
 }
