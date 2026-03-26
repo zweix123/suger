@@ -48,3 +48,7 @@ func MustJsonMarshal(v interface{}) string {
 func Zero[T any]() (zero T) {
 	return
 }
+
+func Ptr[T any](v T) *T {
+	return &v
+}
